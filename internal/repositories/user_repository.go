@@ -3,17 +3,12 @@ package repositories
 import (
 	"database/sql"
 	"errors"
+	"ramori/internal/models"
 )
 
-type User struct {
-	ID    int
-	Name  string
-	Email string
-}
-
 type UserRepository interface {
-	Create(user User) (int, error)
-	GetByID(id int) (*User, error)
+	Create(user models.User) (int, error)
+	GetByID(id int) (*models.User, error)
 }
 
 type MySQLUserRepository struct {
@@ -24,7 +19,7 @@ func NewMySQLUserRepository(db *sql.DB) *MySQLUserRepository {
 	return &MySQLUserRepository{db: db}
 }
 
-func (r *MySQLUserRepository) Create(user User) (int, error) {
+func (r *MySQLUserRepository) Create(user models.User) (int, error) {
 	query := "INSERT INTO users (name, email) VALUES (?, ?)"
 	result, err := r.db.Exec(query, user.Name, user.Email)
 	if err != nil {
@@ -39,8 +34,8 @@ func (r *MySQLUserRepository) Create(user User) (int, error) {
 	return int(id), nil
 }
 
-func (r *MySQLUserRepository) GetByID(id int) (*User, error) {
-	var user User
+func (r *MySQLUserRepository) GetByID(id int) (*models.User, error) {
+	var user models.User
 	query := "SELECT id, name, email FROM users WHERE id = ?"
 	err := r.db.QueryRow(query, id).Scan(&user.ID, &user.Name, &user.Email)
 	if err != nil {
