@@ -6,40 +6,44 @@ import (
 	"ramori/internal/repositories"
 )
 
-type UserUseCase struct {
+type UserUseCase interface {
+	CreateUser(name, email string) (id int, err error)
+	GetUserByID(id int) (*models.User, error)
+}
+
+type userUseCase struct {
 	UserRepo repositories.UserRepository
 }
 
-func NewUserUseCase(repo repositories.UserRepository) *UserUseCase {
-	return &UserUseCase{
+func NewUserUseCase(repo repositories.UserRepository) UserUseCase {
+	return &userUseCase{
 		UserRepo: repo,
 	}
 }
 
-func (uc *UserUseCase) CreateUser(name, email string) (models.User, error) {
+func (uc *userUseCase) CreateUser(name, email string) (id int, err error) {
 
 	if name == "" || email == "" {
-		return models.User{}, errors.New("name and email cannot be empty")
+		return 0, errors.New("name and email cannot be empty")
 	}
 
 	user := models.User{
 		Name:  name,
 		Email: email,
 	}
-	id, err := uc.UserRepo.Create(user)
+
+	id, err = uc.UserRepo.Create(user)
 	if err != nil {
-		return models.User{}, err
+		return 0, err
 	}
 
-	user.ID = id
-	return user, nil
+	return id, nil
 }
 
-func (uc *UserUseCase) GetUserByID(id int) (models.User, error) {
+func (uc *userUseCase) GetUserByID(id int) (*models.User, error) {
 	user, err := uc.UserRepo.GetByID(id)
 	if err != nil {
-		return models.User{}, err
+		return nil, err
 	}
-
-	return *user, nil
+	return user, nil
 }
