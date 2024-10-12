@@ -2,22 +2,29 @@ package main
 
 import (
 	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"net/http"
-
-	_ "github.com/go-sql-driver/mysql"
 	"ramori/internal/controllers"
+	"ramori/internal/repositories"
+	"ramori/internal/usecases"
 )
 
 func main() {
-	dsn := "horacio:12345678@tcp(mysql:3306)/ramori"
+	dsn := "user:password@tcp(localhost:3306)/dbname"
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatalf("Erro ao conectar ao banco de dados: %v", err)
 	}
 	defer db.Close()
 
-	userController := &controllers.UserController{DB: db}
+	userRepo := repositories.NewMySQLUserRepository(db)
+
+	userUseCase := usecases.NewUserUseCase(userRepo)
+
+	userController := &controllers.UserController{
+		UserUseCase: userUseCase,
+	}
 
 	http.HandleFunc("/users", userController.CreateUser)
 
