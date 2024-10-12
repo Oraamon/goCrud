@@ -1,31 +1,30 @@
 package controllers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
-	"ramori/internal/models"
+	"ramori/internal/repositories"
 )
 
 type UserController struct {
-	DB *sql.DB
+	Repo repositories.UserRepository
 }
 
 func (uc *UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
-	var user models.User
+	var user repositories.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	id, err := models.CreateUser(uc.DB, user.Name, user.Email)
+	id, err := uc.Repo.Create(user)
 	if err != nil {
 		http.Error(w, "Error creating user", http.StatusInternalServerError)
 		return
 	}
 
-	user.ID = int(id)
+	user.ID = id
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(user)
 }
