@@ -1,4 +1,3 @@
-# Etapa 1: Build do front-end
 FROM node:14 AS build
 
 WORKDIR /app
