@@ -7,7 +7,7 @@ import (
 )
 
 type UserUseCase interface {
-	CreateUser(name, email string) (id int, err error)
+	CreateUser(firstName, lastName, email, password string) (id int, err error)
 	GetUserByID(id int) (*models.User, error)
 }
 
@@ -21,18 +21,18 @@ func NewUserUseCase(repo repositories.UserRepository) UserUseCase {
 	}
 }
 
-func (uc *userUseCase) CreateUser(name, email string) (id int, err error) {
-
-	if name == "" || email == "" {
-		return 0, errors.New("name and email cannot be empty")
+func (uc *userUseCase) CreateUser(firstName, lastName, email, password string) (int, error) {
+	if firstName == "" || lastName == "" || email == "" || password == "" {
+		return 0, errors.New("first name, last name, email, and password cannot be empty")
 	}
 
 	user := models.User{
-		Name:  name,
-		Email: email,
+		FirstName: firstName,
+		LastName:  lastName,
+		Email:     email,
 	}
 
-	id, err = uc.UserRepo.Create(user)
+	id, err := uc.UserRepo.Create(user, password)
 	if err != nil {
 		return 0, err
 	}

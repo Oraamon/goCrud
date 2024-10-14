@@ -4,16 +4,20 @@ import (
 	"encoding/json"
 	"net/http"
 	"ramori/internal/usecases"
+	"time"
 )
 
 type UserController struct {
-	UserUseCase *usecases.UserUseCase
+	UserUseCase usecases.UserUseCase
 }
 
 func (uc *UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var input struct {
-		Name  string `json:"name"`
-		Email string `json:"email"`
+		FirstName string    `json:"first_name"`
+		LastName  string    `json:"last_name"`
+		Email     string    `json:"email"`
+		Password  string    `json:"password"`
+		CreatedAt time.Time `json:"created_at"`
 	}
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
@@ -21,7 +25,7 @@ func (uc *UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := uc.UserUseCase.CreateUser(input.Name, input.Email)
+	user, err := uc.UserUseCase.CreateUser(input.FirstName, input.LastName, input.Password, input.Email)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
