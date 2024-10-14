@@ -21,7 +21,6 @@ func NewMySQLUserRepository(db *sql.DB) UserRepository {
 }
 
 func (r *MySQLUserRepository) Create(user models.User, password string) (int, error) {
-	// Iniciar uma transação
 	tx, err := r.db.Begin()
 	if err != nil {
 		return 0, err
