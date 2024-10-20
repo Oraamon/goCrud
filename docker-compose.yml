@@ -38,10 +38,17 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: /Dockerfile
+      dockerfile: Dockerfile
     container_name: frontend-container
     ports:
-      - "3000:80"
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true
     networks:
       - app-network
 

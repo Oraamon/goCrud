@@ -16,7 +16,7 @@ type Config struct {
 	DBName   string
 }
 
-func Connect(cfg Config) (*sql.DB, error) {
+func Connect() (*sql.DB, error) {
 	err := godotenv.Load("cmd/configs/.env")
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
